@@ -11,6 +11,9 @@ import XCTest
 
 class SQLiteTests: XCTestCase {
     
+    private static let dbName: String = "test.db"
+    private var configuration = Configuration(fileName: dbName)
+    
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -21,9 +24,15 @@ class SQLiteTests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testConfiguration() {
+        XCTAssertTrue(configuration.path != nil)
+        XCTAssertTrue(configuration.path!.contains(SQLiteTests.dbName))
+    }
+    
+    func testDbOpen() {
+        let connection = try? Connection.open(configuration: self.configuration)
+        XCTAssertTrue(connection != nil)
+        XCTAssertTrue(connection!.isOpen)
     }
     
     func testPerformanceExample() {

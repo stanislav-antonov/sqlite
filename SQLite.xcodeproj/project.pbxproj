@@ -10,6 +10,18 @@
 		903EE4922095CB85008AA562 /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 903EE4882095CB85008AA562 /* SQLite.framework */; };
 		903EE4972095CB85008AA562 /* SQLiteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4962095CB85008AA562 /* SQLiteTests.swift */; };
 		903EE4992095CB85008AA562 /* SQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 903EE48B2095CB85008AA562 /* SQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		903EE4A32095CC95008AA562 /* Db.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4A22095CC95008AA562 /* Db.swift */; };
+		903EE4A52095CD1C008AA562 /* Exception.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4A42095CD1C008AA562 /* Exception.swift */; };
+		903EE4A72095CD75008AA562 /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4A62095CD75008AA562 /* Connection.swift */; };
+		903EE4A92095CD9F008AA562 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4A82095CD9F008AA562 /* Configuration.swift */; };
+		903EE4AB2095CDE5008AA562 /* Statement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4AA2095CDE5008AA562 /* Statement.swift */; };
+		903EE4AD2095CE0F008AA562 /* ResultSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4AC2095CE0F008AA562 /* ResultSet.swift */; };
+		903EE4AF2095CE85008AA562 /* QueuedProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4AE2095CE85008AA562 /* QueuedProtocol.swift */; };
+		903EE4B12095CF32008AA562 /* Queued.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4B02095CF32008AA562 /* Queued.swift */; };
+		903EE4B32095D00B008AA562 /* SchemaActionsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4B22095D00B008AA562 /* SchemaActionsProtocol.swift */; };
+		903EE4B62095E683008AA562 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4B52095E683008AA562 /* Utils.swift */; };
+		903EE4BA2095F686008AA562 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 903EE4B82095F686008AA562 /* libsqlite3.tbd */; };
+		903EE4BB2095F686008AA562 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 903EE4B92095F686008AA562 /* libsqlite3.0.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +41,18 @@
 		903EE4912095CB85008AA562 /* SQLiteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SQLiteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		903EE4962095CB85008AA562 /* SQLiteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteTests.swift; sourceTree = "<group>"; };
 		903EE4982095CB85008AA562 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		903EE4A22095CC95008AA562 /* Db.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Db.swift; sourceTree = "<group>"; };
+		903EE4A42095CD1C008AA562 /* Exception.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exception.swift; sourceTree = "<group>"; };
+		903EE4A62095CD75008AA562 /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
+		903EE4A82095CD9F008AA562 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		903EE4AA2095CDE5008AA562 /* Statement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Statement.swift; sourceTree = "<group>"; };
+		903EE4AC2095CE0F008AA562 /* ResultSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultSet.swift; sourceTree = "<group>"; };
+		903EE4AE2095CE85008AA562 /* QueuedProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueuedProtocol.swift; sourceTree = "<group>"; };
+		903EE4B02095CF32008AA562 /* Queued.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queued.swift; sourceTree = "<group>"; };
+		903EE4B22095D00B008AA562 /* SchemaActionsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaActionsProtocol.swift; sourceTree = "<group>"; };
+		903EE4B52095E683008AA562 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		903EE4B82095F686008AA562 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		903EE4B92095F686008AA562 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +60,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				903EE4BA2095F686008AA562 /* libsqlite3.tbd in Frameworks */,
+				903EE4BB2095F686008AA562 /* libsqlite3.0.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,6 +82,7 @@
 				903EE48A2095CB85008AA562 /* SQLite */,
 				903EE4952095CB85008AA562 /* SQLiteTests */,
 				903EE4892095CB85008AA562 /* Products */,
+				903EE4B72095F685008AA562 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -71,6 +98,7 @@
 		903EE48A2095CB85008AA562 /* SQLite */ = {
 			isa = PBXGroup;
 			children = (
+				903EE4B42095D044008AA562 /* src */,
 				903EE48B2095CB85008AA562 /* SQLite.h */,
 				903EE48C2095CB85008AA562 /* Info.plist */,
 			);
@@ -84,6 +112,32 @@
 				903EE4982095CB85008AA562 /* Info.plist */,
 			);
 			path = SQLiteTests;
+			sourceTree = "<group>";
+		};
+		903EE4B42095D044008AA562 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				903EE4A22095CC95008AA562 /* Db.swift */,
+				903EE4A42095CD1C008AA562 /* Exception.swift */,
+				903EE4A62095CD75008AA562 /* Connection.swift */,
+				903EE4A82095CD9F008AA562 /* Configuration.swift */,
+				903EE4AA2095CDE5008AA562 /* Statement.swift */,
+				903EE4AC2095CE0F008AA562 /* ResultSet.swift */,
+				903EE4AE2095CE85008AA562 /* QueuedProtocol.swift */,
+				903EE4B02095CF32008AA562 /* Queued.swift */,
+				903EE4B22095D00B008AA562 /* SchemaActionsProtocol.swift */,
+				903EE4B52095E683008AA562 /* Utils.swift */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		903EE4B72095F685008AA562 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				903EE4B92095F686008AA562 /* libsqlite3.0.tbd */,
+				903EE4B82095F686008AA562 /* libsqlite3.tbd */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -148,6 +202,7 @@
 				TargetAttributes = {
 					903EE4872095CB85008AA562 = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
 					903EE4902095CB85008AA562 = {
@@ -196,6 +251,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				903EE4B32095D00B008AA562 /* SchemaActionsProtocol.swift in Sources */,
+				903EE4B12095CF32008AA562 /* Queued.swift in Sources */,
+				903EE4A72095CD75008AA562 /* Connection.swift in Sources */,
+				903EE4A52095CD1C008AA562 /* Exception.swift in Sources */,
+				903EE4AB2095CDE5008AA562 /* Statement.swift in Sources */,
+				903EE4B62095E683008AA562 /* Utils.swift in Sources */,
+				903EE4A92095CD9F008AA562 /* Configuration.swift in Sources */,
+				903EE4A32095CC95008AA562 /* Db.swift in Sources */,
+				903EE4AD2095CE0F008AA562 /* ResultSet.swift in Sources */,
+				903EE4AF2095CE85008AA562 /* QueuedProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -334,6 +399,7 @@
 		903EE49D2095CB86008AA562 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -347,6 +413,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = pse.SQLite;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -355,6 +422,7 @@
 		903EE49E2095CB86008AA562 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -376,6 +444,7 @@
 		903EE4A02095CB86008AA562 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ZZ64CR37ZJ;
 				INFOPLIST_FILE = SQLiteTests/Info.plist;
@@ -390,6 +459,7 @@
 		903EE4A12095CB86008AA562 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ZZ64CR37ZJ;
 				INFOPLIST_FILE = SQLiteTests/Info.plist;
