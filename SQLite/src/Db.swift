@@ -10,21 +10,15 @@ import Foundation
 import SQLite3
 
 class Db {
-    private class Wrapper<T> {
-        public let cb: T
-        
-        init(cb: T) {
-            self.cb = cb
-        }
-    }
-    
-    typealias ExecuteCallbackType = ([String: AnyObject]) -> Int
+    typealias ExecuteCallbackType = ([String: String]) -> Int
     
     fileprivate var connection: Connection?
     fileprivate let configuration: Configuration!
     
     private var isExecuting = false
     private var statementCache = NSCache<NSString, NSMutableSet>()
+    
+    private var executeCallback: ExecuteCallbackType?
     
     init(configuration: Configuration) {
         self.configuration = configuration
@@ -110,29 +104,42 @@ class Db {
     }
     
     public func execute(sql: String, callback: ExecuteCallbackType?) throws {
-        let cbPtr = callback != nil ? Utils.bridge(obj: Wrapper(cb: callback)) : nil
-        let connection = try Connection.open(configuration: self.configuration)
+        defer {
+            self.executeCallback = nil
+        }
+        
+        var cbPtr: UnsafeMutableRawPointer? = nil
+        if (callback != nil) {
+            self.executeCallback = callback
+            cbPtr = Utils.bridge(obj: self)
+        }
         
         var error: UnsafeMutablePointer<Int8>? = nil
+        let connection = try Connection.open(configuration: self.configuration)
+        
         if (sqlite3_exec(connection.ptr, sql, {
             (cbPtr, columns, valuesPtr: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?, namesPtr: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?) in
+            
             if (cbPtr == nil) {
                 return SQLITE_OK
             }
             
-            var row = [String: AnyObject]()
+            var row = [String: String]()
             for i: Int32 in 0 ..< columns {
                 let idx = Int(i)
                 if let namePtr = namesPtr?[idx] {
                     let name = String(cString: namePtr)
                     let valuePtr = valuesPtr?[idx]
-                    let value: AnyObject? = valuePtr != nil ? Utils.bridge(ptr: valuePtr!) : nil
+                    let value: String? = valuePtr != nil ? String(cString: valuePtr!) : nil
+                    
                     row[name] = value
                 }
             }
             
-            let wrapper: Wrapper<ExecuteCallbackType> = Utils.bridge(ptr: cbPtr!)
-            return Int32(wrapper.cb(row))
+            let db: Db = Utils.bridge(ptr: cbPtr!)
+            let cb = db.executeCallback
+            
+            return Int32(cb!(row))
         }, cbPtr, &error) != SQLITE_OK) {
             throw Exception.fromMutablePtr(error)
         }

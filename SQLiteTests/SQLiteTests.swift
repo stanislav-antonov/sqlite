@@ -16,11 +16,9 @@ class SQLiteTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
     
@@ -33,6 +31,28 @@ class SQLiteTests: XCTestCase {
         let connection = try? Connection.open(configuration: self.configuration)
         XCTAssertTrue(connection != nil)
         XCTAssertTrue(connection!.isOpen)
+    }
+    
+    func testExecute() throws {
+        let db = Db(configuration: self.configuration)
+        
+        try db.execute(sql: "DROP TABLE IF EXISTS test", callback: nil)
+        try db.execute(sql: "CREATE TABLE test(id INT, value TEXT)", callback: nil)
+        try db.execute(sql: "INSERT INTO test(id, value) VALUES (1, 'test1')", callback: nil)
+        try db.execute(sql: "INSERT INTO test(id, value) VALUES (2, 'test2')", callback: nil)
+        try db.execute(sql: "INSERT INTO test(id, value) VALUES (3, 'test3')", callback: nil)
+        
+        var rows = [[String: String]]()
+        let callback: Db.ExecuteCallbackType = {
+            result in
+            rows.append(result)
+            return 0
+        }
+        
+        try db.execute(sql: "SELECT id, value FROM test ORDER BY id ASC", callback: callback)
+        
+        XCTAssertTrue(rows.count == 3)
+        XCTAssertTrue(rows[1]["value"] == "test2")
     }
     
     func testPerformanceExample() {
