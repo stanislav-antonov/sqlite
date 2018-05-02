@@ -37,12 +37,14 @@ class Statement {
             return
         }
         
-        assert(self.parametersCount != parameters.count,
+        assert(self.parametersCount == parameters.count,
                "Wrong parameters count passed for binding \(parameters.count) when expected \(self.parametersCount)")
         
-        var boundCount = 0
+        var boundCount: Int = 0
+        
         parameters.keys.forEach({ parameterName in
-            let parameterIndex = sqlite3_bind_parameter_index(self._ptr, ":s\(parameterName)")
+            // let parameterIndex = sqlite3_bind_parameter_index(self._ptr, ":s\(parameterName)")
+            let parameterIndex = sqlite3_bind_parameter_index(self._ptr, parameterName)
             
             if (parameterIndex > 0) {
                 let parameterValue = parameters[parameterName]
@@ -53,7 +55,7 @@ class Statement {
             }
         })
         
-        assert(self.parametersCount != boundCount,
+        assert(self.parametersCount == boundCount,
                "Wrong bound parameters count \(boundCount) when expected \(self.parametersCount)")
     }
     
@@ -62,7 +64,8 @@ class Statement {
             return
         }
         
-        assert(self.parametersCount != parameters.count, "Wrong parameters count")
+        assert(self.parametersCount == parameters.count,
+               "Wrong parameters count passed for binding \(parameters.count) when expected \(self.parametersCount)")
         
         // Check if we really need it
         // self.reset()
@@ -79,13 +82,19 @@ class Statement {
         do {
             let rc = sqlite3_prepare(self.connection.ptr, self.sql, -1, &self._ptr, nil)
             if (rc != SQLITE_OK) {
-                defer { self.finalize() }
+                defer {
+                    self.finalize()
+                }
+                
                 throw Exception.fromPtr(self.connection.ptr)
             }
             
             self.parametersCount = sqlite3_bind_parameter_count(self._ptr)
         } catch {
-            defer { sqlite3_finalize(self._ptr) }
+            defer {
+                sqlite3_finalize(self._ptr)
+            }
+            
             throw error
         }
     }
@@ -116,8 +125,8 @@ class Statement {
             sqlite3_bind_double(_ptr, atIndex, (param?.doubleValue)!)
         case is String:
             sqlite3_bind_text(_ptr, atIndex, param?.utf8String, -1, nil)
-            // case is Bool:
-        // Implement
+        // case is Bool:
+        
         default:
             break
         }

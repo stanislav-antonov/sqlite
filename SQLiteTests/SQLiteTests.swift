@@ -33,14 +33,14 @@ class SQLiteTests: XCTestCase {
         XCTAssertTrue(connection!.isOpen)
     }
     
-    func testExecute() throws {
+    func testExecuteRaw() throws {
         let db = Db(configuration: self.configuration)
         
-        try db.execute(sql: "DROP TABLE IF EXISTS test", callback: nil)
-        try db.execute(sql: "CREATE TABLE test(id INT, value TEXT)", callback: nil)
-        try db.execute(sql: "INSERT INTO test(id, value) VALUES (1, 'test1')", callback: nil)
-        try db.execute(sql: "INSERT INTO test(id, value) VALUES (2, 'test2')", callback: nil)
-        try db.execute(sql: "INSERT INTO test(id, value) VALUES (3, 'test3')", callback: nil)
+        try db.execute(sql: "DROP TABLE IF EXISTS test")
+        try db.execute(sql: "CREATE TABLE test(id INT, value TEXT)")
+        try db.execute(sql: "INSERT INTO test(id, value) VALUES (1, 'test1')")
+        try db.execute(sql: "INSERT INTO test(id, value) VALUES (2, 'test2')")
+        try db.execute(sql: "INSERT INTO test(id, value) VALUES (3, 'test3')")
         
         var rows = [[String: String]]()
         let callback: Db.ExecuteCallbackType = {
@@ -53,6 +53,37 @@ class SQLiteTests: XCTestCase {
         
         XCTAssertTrue(rows.count == 3)
         XCTAssertTrue(rows[1]["value"] == "test2")
+    }
+    
+    func testExecutePrepared() throws {
+        let db = Db(configuration: self.configuration)
+        
+        try db.execute(sql: "DROP TABLE IF EXISTS test")
+        try db.execute(sql: "CREATE TABLE test(id INT, status INT, value TEXT)")
+        try db.execute(sql: "INSERT INTO test(id, status, value) VALUES (1, 2, 'test1'), (2, 1, 'test2'), (3, 2, 'test3'), (4, 1, 'test4'), (5, 2, 'test5'), (6, 1, 'test6'), (7, 1, 'test7')")
+        
+        let result1 = try db.execute(
+            sql: "UPDATE test SET status = ? WHERE status = ?",
+            parameters: [1 as AnyObject, 2 as AnyObject]
+        )
+        
+        XCTAssertTrue(result1)
+        
+        let result2 = try db.execute(
+            sql: "UPDATE test SET status = $a WHERE status = $b",
+            parameters: ["$a" :  1 as AnyObject, "$b" : 2 as AnyObject]
+        )
+        
+        XCTAssertTrue(result2)
+        
+        let callback: Db.ExecuteCallbackType = {
+            result in
+            let count = Int(result["cnt"]!)
+            XCTAssertTrue(count == 0)
+            return 0
+        }
+        
+        try db.execute(sql: "SELECT COUNT(*) AS cnt FROM test WHERE status = 2", callback: callback)
     }
     
     func testPerformanceExample() {

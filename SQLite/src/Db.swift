@@ -17,7 +17,6 @@ class Db {
     
     private var isExecuting = false
     private var statementCache = NSCache<NSString, NSMutableSet>()
-    
     private var executeCallback: ExecuteCallbackType?
     
     init(configuration: Configuration) {
@@ -36,71 +35,22 @@ class Db {
         
     }
     
-    private func fetchStatement(sql: String) -> Statement? {
-        let statements = statementCache.object(forKey: sql as NSString)
-        if (statements == nil) {
-            return nil
-        }
-        
-        let freeStatement = statements!.first(where: { o in
-            let statement = o as! Statement
-            return !statement.inUse
-        }) as! Statement?
-        
-        return freeStatement
-    }
-    
-    private func storeStatement(sql: String, statement: Statement) {
-        var statements = statementCache.object(forKey: sql as NSString)
-        if (statements == nil) {
-            statements = NSMutableSet(object: statement)
-            statementCache.setObject(statements!, forKey: sql as NSString)
-        } else {
-            statements!.add(statement)
-        }
-    }
-    
     public func execute(sql: String, parameters: [AnyObject]) throws -> Bool {
-        if (self.isExecuting) {
-            NSLog("Already executing")
-            return false
-        }
-        
-        self.isExecuting = true
-        defer {
-            self.isExecuting = false
-        }
-        
-        if (self.connection == nil) {
-            self.connection = try Connection.open(configuration: self.configuration)
-        }
-        
-        var shouldCacheStatement = false
-        var statement = self.fetchStatement(sql: sql)
-        if (statement != nil) {
-            statement!.reset()
-        } else {
-            statement = try Statement(connection: self.connection!, sql: sql)
-            defer {
-                statement!.finalize()
-            }
-            
-            try statement!.prepare()
-            shouldCacheStatement = true
-        }
-        
-        try statement!.bind(parameters: parameters)
-        
-        let resultSet = ResultSet(statement: statement!)
-        if (resultSet.once()) {
-            if (shouldCacheStatement) {
-                self.storeStatement(sql: sql, statement: statement!)
-            }
-            
-            return true
-        }
-        
-        return false
+        return try self.execute(
+            sql: sql,
+            parameters: parameters as AnyObject,
+            bind: { (statement, parameters) in
+                try statement.bind(parameters: parameters as! [AnyObject])
+            })
+    }
+    
+    public func execute(sql: String, parameters: [String: AnyObject]) throws -> Bool {
+        return try self.execute(
+            sql: sql,
+            parameters: parameters as AnyObject,
+            bind: { (statement, parameters) in
+                try statement.bind(parameters: parameters as! [String: AnyObject])
+        })
     }
     
     public func execute(sql: String, callback: ExecuteCallbackType?) throws {
@@ -117,8 +67,22 @@ class Db {
         var error: UnsafeMutablePointer<Int8>? = nil
         let connection = try Connection.open(configuration: self.configuration)
         
-        if (sqlite3_exec(connection.ptr, sql, {
-            (cbPtr, columns, valuesPtr: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?, namesPtr: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?) in
+        let rc = sqlite3_exec(connection.ptr, sql, executeCallbackWrapper, cbPtr, &error)
+        if (rc != SQLITE_OK) {
+            throw Exception.fromMutablePtr(error)
+        }
+    }
+    
+    public func execute(sql: String) throws {
+        try self.execute(sql: sql, callback: nil)
+    }
+    
+    private let executeCallbackWrapper: @convention(c) (
+        UnsafeMutableRawPointer?, Int32,
+        UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?,
+        UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?) -> Int32 = {
+            
+            (cbPtr, columns, valuesPtr, namesPtr) in
             
             if (cbPtr == nil) {
                 return SQLITE_OK
@@ -136,13 +100,83 @@ class Db {
                 }
             }
             
-            let db: Db = Utils.bridge(ptr: cbPtr!)
-            let cb = db.executeCallback
+            let _self: Db = Utils.bridge(ptr: cbPtr!)
+            let cb = _self.executeCallback
             
             return Int32(cb!(row))
-        }, cbPtr, &error) != SQLITE_OK) {
-            throw Exception.fromMutablePtr(error)
+    }
+    
+    private func fetchStatement(sql: String) -> Statement? {
+        let statements = statementCache.object(forKey: sql as NSString)
+        if (statements == nil) {
+            return nil
         }
+        
+        let freeStatement = statements!.first(where: { o in
+            let statement = o as! Statement
+            return !statement.inUse
+        }) as! Statement?
+        
+        return freeStatement
+    }
+    
+    private func storeStatement(sql: String, statement: Statement) {
+        var statements = statementCache.object(forKey: sql as NSString)
+        
+        if (statements == nil) {
+            statements = NSMutableSet(object: statement)
+            statementCache.setObject(statements!, forKey: sql as NSString)
+        } else {
+            statements!.add(statement)
+        }
+    }
+    
+    private func execute(sql: String, parameters: AnyObject,
+                         bind: (Statement, AnyObject) throws -> Void) throws -> Bool {
+        
+        if (self.isExecuting) {
+            NSLog("Already executing")
+            return false
+        }
+        
+        self.isExecuting = true
+        defer {
+            self.isExecuting = false
+        }
+        
+        if (self.connection == nil) {
+            self.connection = try Connection.open(configuration: self.configuration)
+        }
+        
+        var shouldCacheStatement = false
+        var statement = self.fetchStatement(sql: sql)
+        
+        if (statement != nil) {
+            statement!.reset()
+        } else {
+            do {
+                statement = try Statement(connection: self.connection!, sql: sql)
+                try statement!.prepare()
+            } catch {
+                statement?.finalize()
+                throw error
+            }
+            
+            shouldCacheStatement = true
+        }
+        
+        try bind(statement!, parameters)
+        
+        let resultSet = ResultSet(statement: statement!)
+        if (resultSet.once()) {
+            if (shouldCacheStatement) {
+                self.storeStatement(sql: sql, statement: statement!)
+            }
+            
+            return true
+        }
+        
+        return false
     }
     
     /*
