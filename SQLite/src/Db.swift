@@ -16,23 +16,13 @@ class Db {
     fileprivate let configuration: Configuration!
     
     private var isExecuting = false
+    private var openedResultSets = NSMutableSet()
     private var statementCache = NSCache<NSString, NSMutableSet>()
+    
     private var executeCallback: ExecuteCallbackType?
     
     init(configuration: Configuration) {
         self.configuration = configuration
-    }
-    
-    public func beginTransaction() {
-        
-    }
-    
-    public func commit() {
-        
-    }
-    
-    public func rollback() {
-        
     }
     
     public func execute(sql: String, parameters: [AnyObject]) throws -> Bool {
@@ -45,6 +35,24 @@ class Db {
     }
     
     public func execute(sql: String, parameters: [String: AnyObject]) throws -> Bool {
+        return try self.execute(
+            sql: sql,
+            parameters: parameters as AnyObject,
+            bind: { (statement, parameters) in
+                try statement.bind(parameters: parameters as! [String: AnyObject])
+        })
+    }
+    
+    public func execute(sql: String, parameters: [AnyObject]) throws -> ResultSet? {
+        return try self.execute(
+            sql: sql,
+            parameters: parameters as AnyObject,
+            bind: { (statement, parameters) in
+                try statement.bind(parameters: parameters as! [AnyObject])
+        })
+    }
+    
+    public func execute(sql: String, parameters: [String: AnyObject]) throws -> ResultSet? {
         return try self.execute(
             sql: sql,
             parameters: parameters as AnyObject,
@@ -75,6 +83,18 @@ class Db {
     
     public func execute(sql: String) throws {
         try self.execute(sql: sql, callback: nil)
+    }
+    
+    public func beginTransaction() {
+        
+    }
+    
+    public func commit() {
+        
+    }
+    
+    public func rollback() {
+        
     }
     
     private let executeCallbackWrapper: @convention(c) (
@@ -131,24 +151,11 @@ class Db {
         }
     }
     
-    private func execute(sql: String, parameters: AnyObject,
-                         bind: (Statement, AnyObject) throws -> Void) throws -> Bool {
-        
-        if (self.isExecuting) {
-            NSLog("Already executing")
-            return false
-        }
-        
-        self.isExecuting = true
-        defer {
-            self.isExecuting = false
-        }
-        
+    private func obtainStatemet(sql: String, parameters: AnyObject, bind: (Statement, AnyObject) throws -> Void, shouldCacheStatement: inout Bool) throws -> Statement {
         if (self.connection == nil) {
             self.connection = try Connection.open(configuration: self.configuration)
         }
         
-        var shouldCacheStatement = false
         var statement = self.fetchStatement(sql: sql)
         
         if (statement != nil) {
@@ -167,10 +174,29 @@ class Db {
         
         try bind(statement!, parameters)
         
-        let resultSet = ResultSet(statement: statement!)
+        return statement!
+    }
+    
+    private func execute(sql: String, parameters: AnyObject,
+                         bind: (Statement, AnyObject) throws -> Void) throws -> Bool {
+        
+        if (self.isExecuting) {
+            NSLog("already executing")
+            return false
+        }
+        
+        self.isExecuting = true
+        defer {
+            self.isExecuting = false
+        }
+        
+        var shouldCacheStatement = false
+        let statement = try self.obtainStatemet(sql: sql, parameters: parameters, bind: bind, shouldCacheStatement: &shouldCacheStatement)
+        
+        let resultSet = ResultSet(statement: statement, db: self)
         if (resultSet.once()) {
             if (shouldCacheStatement) {
-                self.storeStatement(sql: sql, statement: statement!)
+                self.storeStatement(sql: sql, statement: statement)
             }
             
             return true
@@ -179,26 +205,35 @@ class Db {
         return false
     }
     
-    /*
-     
-     sqlite3_stmt *stmt;
-     const char *sql = "SELECT ID, Name FROM User";
-     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-     if (rc != SQLITE_OK) {
-     print("error: ", sqlite3_errmsg(db));
-     return;
-     }
-     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-     int id           = sqlite3_column_int (stmt, 0);
-     const char *name = sqlite3_column_text(stmt, 1);
-     // ...
-     }
-     if (rc != SQLITE_DONE) {
-     print("error: ", sqlite3_errmsg(db));
-     }
-     sqlite3_finalize(stmt);
-     
-     */
+    private func execute(sql: String, parameters: AnyObject,
+                         bind: (Statement, AnyObject) throws -> Void) throws -> ResultSet? {
+        
+        if (self.isExecuting) {
+            NSLog("already executing")
+            return nil
+        }
+        
+        self.isExecuting = true
+        defer {
+            self.isExecuting = false
+        }
+        
+        var shouldCacheStatement = false
+        let statement = try self.obtainStatemet(sql: sql, parameters: parameters, bind: bind, shouldCacheStatement: &shouldCacheStatement)
+        
+        let resultSet = ResultSet(statement: statement, db: self)
+        self.openedResultSets.add(resultSet)
+        
+        if (shouldCacheStatement) {
+            self.storeStatement(sql: sql, statement: statement)
+        }
+        
+        return resultSet
+    }
+    
+    internal func resultSetClosed(resultSet: ResultSet) {
+        self.openedResultSets.remove(resultSet)
+    }
 }
 
 
