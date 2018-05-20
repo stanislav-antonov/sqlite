@@ -78,7 +78,7 @@ class Statement {
                     self.finalize()
                 }
                 
-                throw Exception.fromPtr(self.connection.ptr)
+                throw Exception.message(Utils.getErrorMessage(ptr: self.connection.ptr))
             }
             
             self.parametersCount = sqlite3_bind_parameter_count(self._ptr)

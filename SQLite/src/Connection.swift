@@ -23,7 +23,7 @@ class Connection {
     public static func open(configuration: Configuration) throws -> Connection {
         let connection = Connection(configuration: configuration)
         if (try connection.open() == false) {
-            throw Exception.fromString("Failed to open connection")
+            throw Exception.message("Failed to open connection")
         }
         
         return connection
@@ -41,7 +41,7 @@ class Connection {
         let rc = sqlite3_open_v2(self.configuration.path, &self._ptr, self.configuration.openFlags, nil)
         if (rc != SQLITE_OK) {
             defer { self.close() }
-            throw Exception.fromPtr(self.ptr)
+            throw Exception.message(Utils.getErrorMessage(ptr: self.ptr))
         }
         
         self.setBusyRetryHandler()

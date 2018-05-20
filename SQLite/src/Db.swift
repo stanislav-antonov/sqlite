@@ -13,6 +13,10 @@ class Db {
     
     private var executeCallback: ExecuteCallbackType?
     
+    public var lastError: String {
+        return Utils.getErrorMessage(ptr: self.connection!.ptr)
+    }
+    
     init(configuration: Configuration) {
         self.configuration = configuration
     }
@@ -64,12 +68,12 @@ class Db {
             cbPtr = Utils.bridge(obj: self)
         }
         
-        var error: UnsafeMutablePointer<Int8>? = nil
+        var errorPtr: UnsafeMutablePointer<Int8>? = nil
         let connection = try Connection.open(configuration: self.configuration)
         
-        let rc = sqlite3_exec(connection.ptr, sql, executeCallbackWrapper, cbPtr, &error)
+        let rc = sqlite3_exec(connection.ptr, sql, executeCallbackWrapper, cbPtr, &errorPtr)
         if (rc != SQLITE_OK) {
-            throw Exception.fromMutablePtr(error)
+            throw Exception.message(Utils.getErrorMessage(ptr: errorPtr))
         }
     }
     

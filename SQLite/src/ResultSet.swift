@@ -30,9 +30,9 @@ class ResultSet {
         } else if (rc == SQLITE_BUSY || rc == SQLITE_LOCKED) {
             errorMessage = "Database is busy: \(self.db!.configuration!.fileName)"
         } else if (rc == SQLITE_ERROR || rc == SQLITE_MISUSE) {
-            errorMessage = "Error on sqlite3_step (\(rc)): \(sqlite3_errmsg(self.db!.connection!.ptr))"
+            errorMessage = "Error on sqlite3_step (\(rc)): \(self.db!.lastError)"
         } else {
-            errorMessage = "Unknown error on sqlite3_step (\(rc)): \(sqlite3_errmsg(self.db!.connection!.ptr))"
+            errorMessage = "Unknown error on sqlite3_step (\(rc)): \(self.db!.lastError)"
         }
         
         if (errorMessage != nil) {
