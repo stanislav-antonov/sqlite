@@ -1,19 +1,11 @@
-//
-//  SQLite.swift
-//  SQLite
-//
-//  Created by Stanislav Antonov on 29/04/2018.
-//  Copyright © 2018 Practical Software Engineering. All rights reserved.
-//
-
 import Foundation
 import SQLite3
 
 class Db {
     typealias ExecuteCallbackType = ([String: String]) -> Int
     
-    fileprivate var connection: Connection?
-    fileprivate let configuration: Configuration!
+    internal var connection: Connection?
+    internal let configuration: Configuration!
     
     private var isExecuting = false
     private var openedResultSets = NSMutableSet()
@@ -181,7 +173,7 @@ class Db {
                          bind: (Statement, AnyObject) throws -> Void) throws -> Bool {
         
         if (self.isExecuting) {
-            NSLog("already executing")
+            NSLog("Already executing")
             return false
         }
         
@@ -194,9 +186,15 @@ class Db {
         let statement = try self.obtainStatemet(sql: sql, parameters: parameters, bind: bind, shouldCacheStatement: &shouldCacheStatement)
         
         let resultSet = ResultSet(statement: statement, db: self)
-        if (resultSet.once()) {
+        let result: (hasRows: Bool, status: Status) = resultSet.next()
+        
+        if (!result.status.isError) {
             if (shouldCacheStatement) {
                 self.storeStatement(sql: sql, statement: statement)
+            }
+            
+            if (result.hasRows) {
+                resultSet.close()
             }
             
             return true
@@ -209,7 +207,7 @@ class Db {
                          bind: (Statement, AnyObject) throws -> Void) throws -> ResultSet? {
         
         if (self.isExecuting) {
-            NSLog("already executing")
+            NSLog("Already executing")
             return nil
         }
         

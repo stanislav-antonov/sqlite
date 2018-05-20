@@ -62,14 +62,14 @@ class SQLiteTests: XCTestCase {
         try db.execute(sql: "CREATE TABLE test(id INT, status INT, value TEXT)")
         try db.execute(sql: "INSERT INTO test(id, status, value) VALUES (1, 2, 'test1'), (2, 1, 'test2'), (3, 2, 'test3'), (4, 1, 'test4'), (5, 2, 'test5'), (6, 1, 'test6'), (7, 1, 'test7')")
         
-        let result1 = try db.execute(
+        let result1: Bool = try db.execute(
             sql: "UPDATE test SET status = ? WHERE status = ?",
             parameters: [1 as AnyObject, 2 as AnyObject]
         )
         
         XCTAssertTrue(result1)
         
-        let result2 = try db.execute(
+        let result2: Bool = try db.execute(
             sql: "UPDATE test SET status = $a WHERE status = $b",
             parameters: ["$a" :  1 as AnyObject, "$b" : 2 as AnyObject]
         )

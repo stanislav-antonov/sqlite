@@ -1,11 +1,3 @@
-//
-//  SQLiteResultset.swift
-//  SQLite
-//
-//  Created by Stanislav Antonov on 29/04/2018.
-//  Copyright © 2018 Practical Software Engineering. All rights reserved.
-//
-
 import Foundation
 import SQLite3
 
@@ -16,15 +8,48 @@ class ResultSet {
     init(statement: Statement, db: Db) {
         self.db = db
         self.statement = statement
-    }
-    
-    public func once() -> Bool {
-        let rc: Int32 = sqlite3_step(statement!.ptr)
-        return rc == SQLITE_OK || rc == SQLITE_DONE
+        self.statement?.inUse = true
     }
     
     public func next() -> Bool {
-        return true
+        let result: (hasRows: Bool, status: Status) = next()
+        return result.hasRows
+    }
+    
+    public func next() -> (hasRows: Bool, status: Status) {
+        let status = Status()
+        let rc: Int32 = sqlite3_step(statement!.ptr)
+        
+        status.isError = true
+        status.resultCode = Int(rc)
+        
+        var errorMessage: String? = nil
+        if (rc == SQLITE_DONE || rc == SQLITE_ROW) {
+            // It's ok, nothing to do
+            status.isError = false
+        } else if (rc == SQLITE_BUSY || rc == SQLITE_LOCKED) {
+            errorMessage = "Database is busy: \(self.db!.configuration!.fileName)"
+        } else if (rc == SQLITE_ERROR || rc == SQLITE_MISUSE) {
+            errorMessage = "Error on sqlite3_step (\(rc)): \(sqlite3_errmsg(self.db!.connection!.ptr))"
+        } else {
+            errorMessage = "Unknown error on sqlite3_step (\(rc)): \(sqlite3_errmsg(self.db!.connection!.ptr))"
+        }
+        
+        if (errorMessage != nil) {
+            NSLog(errorMessage!)
+            status.errorMessage = errorMessage
+        }
+        
+        var hasRows = false
+        if (rc == SQLITE_ROW) {
+            // So far some rows there
+            hasRows = true
+        } else {
+            // No more rows, or some erorr was occured
+            self.close()
+        }
+        
+        return (hasRows, status)
     }
     
     public func close() {

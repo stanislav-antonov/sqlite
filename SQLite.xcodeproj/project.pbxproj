@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		902A940F20B1C70200E3EB59 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 902A940E20B1C70200E3EB59 /* Status.swift */; };
 		903EE4922095CB85008AA562 /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 903EE4882095CB85008AA562 /* SQLite.framework */; };
 		903EE4972095CB85008AA562 /* SQLiteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903EE4962095CB85008AA562 /* SQLiteTests.swift */; };
 		903EE4992095CB85008AA562 /* SQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 903EE48B2095CB85008AA562 /* SQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -35,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		902A940E20B1C70200E3EB59 /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
 		903EE4882095CB85008AA562 /* SQLite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SQLite.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		903EE48B2095CB85008AA562 /* SQLite.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SQLite.h; sourceTree = "<group>"; };
 		903EE48C2095CB85008AA562 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				903EE4B02095CF32008AA562 /* Queued.swift */,
 				903EE4B22095D00B008AA562 /* SchemaActionsProtocol.swift */,
 				903EE4B52095E683008AA562 /* Utils.swift */,
+				902A940E20B1C70200E3EB59 /* Status.swift */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -254,6 +257,7 @@
 				903EE4B32095D00B008AA562 /* SchemaActionsProtocol.swift in Sources */,
 				903EE4B12095CF32008AA562 /* Queued.swift in Sources */,
 				903EE4A72095CD75008AA562 /* Connection.swift in Sources */,
+				902A940F20B1C70200E3EB59 /* Status.swift in Sources */,
 				903EE4A52095CD1C008AA562 /* Exception.swift in Sources */,
 				903EE4AB2095CDE5008AA562 /* Statement.swift in Sources */,
 				903EE4B62095E683008AA562 /* Utils.swift in Sources */,

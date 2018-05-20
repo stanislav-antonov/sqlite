@@ -1,11 +1,3 @@
-//
-//  SQLiteQueued.swift
-//  SQLite
-//
-//  Created by Stanislav Antonov on 29/04/2018.
-//  Copyright © 2018 Practical Software Engineering. All rights reserved.
-//
-
 import Foundation
 
 class Queued: Db, QueuedProtocol {
