@@ -100,26 +100,5 @@ class ResultSet {
     deinit {
         self.close()
     }
-    
-    /*
-     
-     sqlite3_stmt *stmt;
-     const char *sql = "SELECT ID, Name FROM User";
-     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-     if (rc != SQLITE_OK) {
-     print("error: ", sqlite3_errmsg(db));
-     return;
-     }
-     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-     int id           = sqlite3_column_int (stmt, 0);
-     const char *name = sqlite3_column_text(stmt, 1);
-     // ...
-     }
-     if (rc != SQLITE_DONE) {
-     print("error: ", sqlite3_errmsg(db));
-     }
-     sqlite3_finalize(stmt);
-     
-     */
 }
 
