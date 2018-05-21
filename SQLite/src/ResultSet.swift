@@ -5,10 +5,31 @@ class ResultSet {
     private weak var db: Db?
     private weak var statement: Statement?
     
+    private var _columnNameToIndex: [String: Int32]? = nil
+    private var columnNameToIndex: [String: Int32] {
+        if (self._columnNameToIndex == nil) {
+            let columnsCount: Int32 = sqlite3_column_count(self.statement!.ptr)
+            var columnNameToIndex = [String: Int32]()
+            
+            for index: Int32 in 0 ..< columnsCount {
+                let columnName = String(cString: sqlite3_column_name(self.statement!.ptr, index))
+                columnNameToIndex[columnName.lowercased()] = index
+            }
+            
+            self._columnNameToIndex = columnNameToIndex
+        }
+        
+        return self._columnNameToIndex!
+    }
+    
     init(statement: Statement, db: Db) {
         self.db = db
         self.statement = statement
         self.statement?.inUse = true
+    }
+    
+    public func columsCount() -> Int {
+        return Int(sqlite3_column_count(self.statement!.ptr))
     }
     
     public func next() -> Bool {
@@ -18,7 +39,7 @@ class ResultSet {
     
     public func next() -> (hasRows: Bool, status: Status) {
         let status = Status()
-        let rc: Int32 = sqlite3_step(statement!.ptr)
+        let rc: Int32 = sqlite3_step(self.statement!.ptr)
         
         status.isError = true
         status.resultCode = Int(rc)
@@ -51,6 +72,11 @@ class ResultSet {
         
         return (hasRows, status)
     }
+
+    public func getInt(_ columnName: String) -> Int? {
+        let index = self.getIndex(columnName: columnName)
+        return index != nil ? Int(sqlite3_column_int(self.statement!.ptr, index!)) : nil
+    }
     
     public func close() {
         self.statement?.reset()
@@ -58,6 +84,17 @@ class ResultSet {
         
         self.db = nil
         self.statement = nil
+        
+        self._columnNameToIndex?.removeAll()
+    }
+    
+    private func getIndex(columnName: String) -> Int32? {
+        let index = self.columnNameToIndex[columnName.lowercased()]
+        if (index == nil) {
+            NSLog("Can't find the column for name \(columnName.lowercased())")
+        }
+        
+        return index
     }
     
     deinit {
